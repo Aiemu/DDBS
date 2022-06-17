@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  configsvr0:
+    container_name: configsvr0
+    image: mongo
+    command: mongod --configsvr --replSet cfgrs --port 27017 --dbpath /data/db/dbms1
+    ports:
+      - 27600:27017
+    volumes:
+      - configsvr0:/data/db/dbms1
+
+  configsvr1:
+    container_name: configsvr1
+    image: mongo
+    command: mongod --configsvr --replSet cfgrs --port 27017 --dbpath /data/db/dbms2
+    ports:
+      - 27601:27017
+    volumes:
+      - configsvr1:/data/db/dbms2
+
+  shardsvr00:
+    container_name: shardsvr00
+    image: mongo
+    command: mongod --shardsvr --replSet shard0 --port 27017 --dbpath /data/db/dbms1
+    ports:
+      - 27700:27017
+    volumes:
+      - shardsvr00:/data/db/dbms1
+
+  shardsvr01:
+    container_name: shardsvr01
+    image: mongo
+    command: mongod --shardsvr --replSet shardrep --port 27017 --dbpath /data/db/dbms1
+    ports:
+      - 27701:27017
+    volumes:
+      - shardsvr01:/data/db/dbms1
+
+  shardsvr10:
+    container_name: shardsvr10
+    image: mongo
+    command: mongod --shardsvr --replSet shardrep --port 27017 --dbpath /data/db/dbms2
+    ports:
+      - 27710:27017
+    volumes:
+      - shardsvr10:/data/db/dbms2
+
+  shardsvr11:
+    container_name: shardsvr11
+    image: mongo
+    command: mongod --shardsvr --replSet shard1 --port 27017 --dbpath /data/db/dbms2
+    ports:
+      - 27711:27017
+    volumes:
+      - shardsvr11:/data/db/dbms2
+
+  mongos:
+    container_name: router
+    image: mongo
+    command: mongos --configdb cfgrs/192.168.101.165:27600,192.168.101.165:27601 --bind_ip 0.0.0.0 --port 27017
+    ports:
+      - 27500:27017
+
+volumes:
+  configsvr0: {}
+  configsvr1: {}
+  shardsvr00: {}
+  shardsvr01: {}
+  shardsvr10: {}
+  shardsvr11: {}

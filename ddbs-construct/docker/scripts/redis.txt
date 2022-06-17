@@ -1,0 +1,3 @@
+CONFIG SET maxmemory 100mb
+CONFIG SET maxmemory-policy allkeys-lru
+exit
